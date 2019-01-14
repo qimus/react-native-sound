@@ -7,6 +7,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.net.Uri;
 import android.media.AudioManager;
+import android.provider.Settings;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
@@ -146,18 +147,24 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
   }
 
   protected MediaPlayer createMediaPlayer(final String fileName) {
-    int res = this.context.getResources().getIdentifier(fileName, "raw", this.context.getPackageName());
-    MediaPlayer mediaPlayer = new MediaPlayer();
-    if (res != 0) {
-      try {
-        AssetFileDescriptor afd = context.getResources().openRawResourceFd(res);
-        mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-        afd.close();
-      } catch (IOException e) {
-        Log.e("RNSoundModule", "Exception", e);
-        return null;
+
+    MediaPlayer mediaPlayer;
+    if (fileName.equals("")) {
+      mediaPlayer = MediaPlayer.create(getCurrentActivity(), Settings.System.DEFAULT_RINGTONE_URI);
+    } else {
+      mediaPlayer = new MediaPlayer();
+      int res = this.context.getResources().getIdentifier(fileName, "raw", this.context.getPackageName());
+      if (res != 0) {
+        try {
+          AssetFileDescriptor afd = context.getResources().openRawResourceFd(res);
+          mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+          afd.close();
+        } catch (IOException e) {
+          Log.e("RNSoundModule", "Exception", e);
+          return null;
+        }
+        return mediaPlayer;
       }
-      return mediaPlayer;
     }
 
     if (fileName.startsWith("http://") || fileName.startsWith("https://")) {
