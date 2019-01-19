@@ -148,7 +148,7 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
 
   protected MediaPlayer createMediaPlayer(final String fileName) {
     if (fileName.equals("")) {
-      return MediaPlayer.create(getCurrentActivity(), Settings.System.DEFAULT_RINGTONE_URI);
+      return MediaPlayer.create(this.context, Settings.System.DEFAULT_RINGTONE_URI);
     }
 
     int res = this.context.getResources().getIdentifier(fileName, "raw", this.context.getPackageName());
